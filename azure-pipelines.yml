@@ -2,7 +2,7 @@ trigger:
 - main
 
 variables:
-  azureSubscription: '76554242-9749-4833-82ab-ba4cb890162e'
+  azureSubscription: 'cron-service-connection'
   functionAppName: 'cron-api'
   environmentName: 'cron-api'
   vmImageName: 'ubuntu-latest'
