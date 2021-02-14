@@ -15,9 +15,14 @@ const DescriptionForm: React.FC = () => {
     }
 
     async function fetchData() {
+      const url =
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:7071"
+          : "https://cron-api.azurewebsites.net";
+
       try {
         const result = await axios(
-          "http://localhost:7071/api/DescribeExpression/" + toBase64(search)
+          `${url}/api/DescribeExpression/${toBase64(search)}`
         );
         setDescription(result.data);
       } catch (error) {
