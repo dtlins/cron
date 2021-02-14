@@ -12,6 +12,7 @@ function App() {
       alignItems="stretch"
       spacing={5}
       className={styles.App}
+      style={{ margin: "auto" }}
     >
       <Grid item className="App-header">
         <h1>Cron Expression Descriptor</h1>

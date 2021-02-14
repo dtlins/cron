@@ -6,21 +6,18 @@ import axios from "axios";
 
 const DescriptionForm: React.FC = () => {
   const [description, setDescription] = useState();
-  const [cron, setQuery] = useState("");
+  const [cron, setQuery] = useState("0 18 ? * MON-FRI");
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    function toBase64(str: string) {
-      return Buffer.from(str).toString("base64");
-    }
-
     async function fetchData() {
       const url = "http://localhost:7071";
-
       try {
-        const result = await axios(
-          `${url}/api/DescribeExpression/${toBase64(search)}`
-        );
+        const result = await axios(`${url}/api/DescribeExpression/`, {
+          params: {
+            expression: search,
+          },
+        });
         setDescription(result.data);
       } catch (error) {
         setDescription(error.response.data);
