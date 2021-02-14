@@ -1,45 +1,68 @@
 trigger:
-- master
+- main
 
-jobs:
-- job: Build
-  pool:
-    vmImage: 'ubuntu-latest'
-  steps:
-  - task: Npm@1
-    inputs:
-      command: 'install'
-      workingDir: 'src/web'
-  - task: Npm@1
-    inputs:
-      command: 'custom'
-      workingDir: 'src/web'
-      customCommand: 'run build'
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: 'src/web/build'
-      ArtifactName: 'web'
-      publishLocation: 'Container'
+variables:
+  # Azure Resource Manager connection created during pipeline creation
+  azureSubscription: '76554242-9749-4833-82ab-ba4cb890162e'
+
+  # Function app name
+  functionAppName: 'cron-api'
+ 
+  # Environment name
+  environmentName: 'cron-api'
+ 
+  # Agent VM image name
+  vmImageName: 'ubuntu-latest'
+
+stages:
+- stage: Build
+  displayName: Build stage
+  jobs:  
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Npm@1
+      inputs:
+        command: 'install'
+        workingDir: 'src/web'
+    - task: Npm@1
+      inputs:
+        command: 'custom'
+        workingDir: 'src/web'
+        customCommand: 'run build'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'src/web/build'
+        ArtifactName: 'web'
+        publishLocation: 'Container'
 
 
-- deployment: Deploy
-  pool:
-    vmImage: 'windows-latest'
-  environment: drop2
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-          - task: DownloadBuildArtifacts@0
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'web'
-              downloadPath: '$(System.ArtifactsDirectory)'
-          - task: AzureFileCopy@4
-            inputs:
-              SourcePath: '$(System.ArtifactsDirectory)/web/*'
-              azureSubscription: 'Azure drop2'
-              Destination: 'AzureBlob'
-              storage: 'drop2'
-              ContainerName: '$web'
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    environment: $(environmentName)
+    pool: 
+      vmImage: $(vmImageName)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - task: DownloadBuildArtifacts@0
+              inputs:
+                buildType: 'current'
+                downloadType: 'single'
+                artifactName: 'web'
+                downloadPath: '$(System.ArtifactsDirectory)'
+            - task: AzureFileCopy@4
+              inputs:
+                SourcePath: '$(System.ArtifactsDirectory)/web/*'
+                azureSubscription: 'Azure drop2'
+                Destination: 'AzureBlob'
+                storage: 'drop2'
+                ContainerName: '$web'
