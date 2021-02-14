@@ -5,7 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using System;
 
-namespace cron.Api
+namespace cron.api
 {
     public static class DescribeExpression
     {
