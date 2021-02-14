@@ -15,10 +15,7 @@ const DescriptionForm: React.FC = () => {
     }
 
     async function fetchData() {
-      const url =
-        process.env.NODE_ENV === "development"
-          ? "http://localhost:7071"
-          : "https://cron-api.azurewebsites.net";
+      const url = "http://localhost:7071";
 
       try {
         const result = await axios(
