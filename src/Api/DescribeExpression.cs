@@ -1,25 +1,29 @@
+using System;
+using System.Text;
 using CronExpressionDescriptor;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using System;
+using Microsoft.Extensions.Logging;
 
 namespace cron.api
 {
     public static class DescribeExpression
     {
         [FunctionName("DescribeExpression")]
-        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "DescribeExpression/{expression}")] HttpRequest req, string expression)
+        public static IActionResult Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get",
+             Route = "DescribeExpression/{expression}")] HttpRequest req,
+             string expression,
+             ILogger log)
         {
-            try
+            expression = Encoding.UTF8.GetString(Convert.FromBase64String(expression));
+            log.LogInformation($"expression: {expression}");
+            return new OkObjectResult(ExpressionDescriptor.GetDescription(expression, new Options
             {
-                return new OkObjectResult(ExpressionDescriptor.GetDescription(expression));
-            }
-            catch (FormatException ex)
-            {
-                return new BadRequestObjectResult(ex.Message);
-            }
+                ThrowExceptionOnParseError = false
+            }));
         }
     }
 }
