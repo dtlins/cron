@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "cron descriptor",
+  "name": "cron descriptor app",
   "icons": [
     {
       "src": "favicon.ico",
