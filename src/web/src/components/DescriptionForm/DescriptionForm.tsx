@@ -11,9 +11,10 @@ const DescriptionForm: React.FC = () => {
 
   useEffect(() => {
     async function fetchData() {
-      const url = "http://localhost:7071";
+      const url =
+        process.env.NODE_ENV === "development" ? "http://localhost:7071/" : "/";
       try {
-        const result = await axios(`${url}/api/DescribeExpression/`, {
+        const result = await axios(`${url}api/DescribeExpression/`, {
           params: {
             expression: search,
           },
