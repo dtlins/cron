@@ -2,17 +2,11 @@ trigger:
 - main
 
 variables:
-  # Azure Resource Manager connection created during pipeline creation
   azureSubscription: '76554242-9749-4833-82ab-ba4cb890162e'
-
-  # Function app name
   functionAppName: 'cron-api'
- 
-  # Environment name
   environmentName: 'cron-api'
- 
-  # Agent VM image name
   vmImageName: 'ubuntu-latest'
+  webStorageName: 'cronweb'
 
 stages:
 - stage: Build
@@ -62,7 +56,7 @@ stages:
             - task: AzureFileCopy@4
               inputs:
                 SourcePath: '$(System.ArtifactsDirectory)/web/*'
-                azureSubscription: 'Azure drop2'
+                azureSubscription: '$(azureSubscription)'
                 Destination: 'AzureBlob'
-                storage: 'drop2'
+                storage: '$(webStorageName)'
                 ContainerName: '$web'
