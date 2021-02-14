@@ -1,0 +1,45 @@
+trigger:
+- master
+
+jobs:
+- job: Build
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - task: Npm@1
+    inputs:
+      command: 'install'
+      workingDir: 'src/web'
+  - task: Npm@1
+    inputs:
+      command: 'custom'
+      workingDir: 'src/web'
+      customCommand: 'run build'
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: 'src/web/build'
+      ArtifactName: 'web'
+      publishLocation: 'Container'
+
+
+- deployment: Deploy
+  pool:
+    vmImage: 'windows-latest'
+  environment: drop2
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+          - task: DownloadBuildArtifacts@0
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'web'
+              downloadPath: '$(System.ArtifactsDirectory)'
+          - task: AzureFileCopy@4
+            inputs:
+              SourcePath: '$(System.ArtifactsDirectory)/web/*'
+              azureSubscription: 'Azure drop2'
+              Destination: 'AzureBlob'
+              storage: 'drop2'
+              ContainerName: '$web'
